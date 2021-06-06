@@ -5,7 +5,9 @@ import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.DatePicker
+import android.widget.Spinner
 import android.widget.TimePicker
 import androidx.room.Room
 import com.google.android.material.textfield.TextInputEditText
@@ -22,8 +24,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     // Interface invoked when you show the dialog and when you click on any value of dialog
     lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
-
     lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
+
+    private val categoryTypes = arrayListOf<String>("Personal",
+            "Business",
+            "Insurance",
+            "Shopping",
+            "Banking")
 
     val db by lazy {
         Room.databaseBuilder(
@@ -36,6 +43,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var dateEdt: TextInputEditText
     lateinit var timeInputLay: TextInputLayout
     lateinit var timeEdt: TextInputEditText
+    lateinit var spinnerCategory: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,12 +53,15 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         dateEdt.setOnClickListener(this)
         timeEdt.setOnClickListener(this)
+
+        setUpSpinner()
     }
 
     private fun connectToLayout() {
         dateEdt = findViewById(R.id.dateEdt)
         timeInputLay = findViewById(R.id.timeInputLay)
         timeEdt = findViewById(R.id.timeEdt)
+        spinnerCategory = findViewById(R.id.spinnerCategory)
     }
 
     override fun onClick(v: View) {
@@ -62,6 +73,12 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
                 setTimeListener()
             }
         }
+    }
+
+    private fun setUpSpinner() {
+        val adaptor = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categoryTypes)
+        categoryTypes.sort()
+        spinnerCategory.adapter = adaptor
     }
 
     private fun setTimeListener() {
