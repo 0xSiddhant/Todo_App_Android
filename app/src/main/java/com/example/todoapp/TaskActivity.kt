@@ -1,10 +1,12 @@
 package com.example.todoapp
 
 import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.room.Room
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -21,6 +23,8 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     // Interface invoked when you show the dialog and when you click on any value of dialog
     lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
 
+    lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
+
     val db by lazy {
         Room.databaseBuilder(
                 this,
@@ -31,6 +35,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
     lateinit var dateEdt: TextInputEditText
     lateinit var timeInputLay: TextInputLayout
+    lateinit var timeEdt: TextInputEditText
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,11 +44,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         connectToLayout()
 
         dateEdt.setOnClickListener(this)
+        timeEdt.setOnClickListener(this)
     }
 
     private fun connectToLayout() {
         dateEdt = findViewById(R.id.dateEdt)
         timeInputLay = findViewById(R.id.timeInputLay)
+        timeEdt = findViewById(R.id.timeEdt)
     }
 
     override fun onClick(v: View) {
@@ -51,8 +58,29 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             R.id.dateEdt -> {
                 setListener()
             }
+            R.id.timeEdt -> {
+                setTimeListener()
+            }
         }
     }
+
+    private fun setTimeListener() {
+        myCalender = Calendar.getInstance()
+
+        timeSetListener = TimePickerDialog.OnTimeSetListener { _ : TimePicker, hourOfDay: Int, minute: Int ->
+            myCalender.set(Calendar.HOUR, hourOfDay)
+            myCalender.set(Calendar.MINUTE, minute)
+            updateTime()
+        }
+
+        val timePickerDialog = TimePickerDialog(this,
+                timeSetListener,
+                myCalender.get(Calendar.HOUR_OF_DAY),
+                myCalender.get(Calendar.MINUTE),
+                false)
+        timePickerDialog.show()
+    }
+
 
     private  fun setListener() {
         myCalender = Calendar.getInstance()
@@ -86,5 +114,13 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         dateEdt.setText(sdf.format(myCalender.time))
 
         timeInputLay.visibility = View.VISIBLE
+    }
+
+    private fun updateTime() {
+        //3:32 am
+        val myFormat = "h:mm a"
+        val sdf = SimpleDateFormat(myFormat)
+
+        timeEdt.setText(sdf.format(myCalender.time))
     }
 }
