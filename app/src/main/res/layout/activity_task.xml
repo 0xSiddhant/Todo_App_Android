@@ -126,7 +126,7 @@
         app:hintTextColor="@color/colorAccent"
         app:boxStrokeColor="@color/colorAccent"
         android:visibility="gone"
-        android:id="@+id/timeInptLay"
+        android:id="@+id/timeInputLay"
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
