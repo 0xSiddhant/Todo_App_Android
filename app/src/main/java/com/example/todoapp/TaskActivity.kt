@@ -12,6 +12,11 @@ import android.widget.TimePicker
 import androidx.room.Room
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.android.synthetic.main.activity_task.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +31,9 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var dateSetListener: DatePickerDialog.OnDateSetListener
     lateinit var timeSetListener: TimePickerDialog.OnTimeSetListener
 
+    var finalDate = 0L
+    var finalTime = 0L
+
     private val categoryTypes = arrayListOf<String>("Personal",
             "Business",
             "Insurance",
@@ -33,11 +41,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             "Banking")
 
     val db by lazy {
-        Room.databaseBuilder(
-                this,
-                AppDatabase::class.java,
-                DB_NAME
-        )
+       AppDatabase.getDatabase(this)
     }
 
     lateinit var dateEdt: TextInputEditText
@@ -53,6 +57,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
 
         dateEdt.setOnClickListener(this)
         timeEdt.setOnClickListener(this)
+        saveBtn.setOnClickListener(this)
 
         setUpSpinner()
     }
@@ -72,8 +77,34 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
             R.id.timeEdt -> {
                 setTimeListener()
             }
+            R.id.saveBtn -> {
+                saveTodo()
+            }
         }
     }
+
+    private fun saveTodo() {
+        val category = spinnerCategory.selectedItem.toString()
+        val title = titleInpLay.editText?.text.toString()
+        val description = taskInpLay.editText?.text.toString()
+
+        GlobalScope.launch(Dispatchers.Main) {
+            val id = withContext(Dispatchers.IO) {
+                return@withContext db.todoDao().insertTask(
+                    TodoModel(
+                        title,
+                        description,
+                        category,
+                        finalDate,
+                        finalTime
+                    )
+                )
+            }
+            finish()
+        }
+
+    }
+
 
     private fun setUpSpinner() {
         val adaptor = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, categoryTypes)
@@ -127,7 +158,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         //Mon, 5,Jun 2021
         val myFormat = "EEE d MMM yyyy"
         val sdf = SimpleDateFormat(myFormat)
-
+        finalDate = myCalender.time.time
         dateEdt.setText(sdf.format(myCalender.time))
 
         timeInputLay.visibility = View.VISIBLE
@@ -137,7 +168,7 @@ class TaskActivity : AppCompatActivity(), View.OnClickListener {
         //3:32 am
         val myFormat = "h:mm a"
         val sdf = SimpleDateFormat(myFormat)
-
+        finalTime = myCalender.time.time
         timeEdt.setText(sdf.format(myCalender.time))
     }
 }

@@ -6,12 +6,35 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
+
+    val list = arrayListOf<TodoModel>()
+    var adaptor = TodoAdapotor(list)
+
+    val db by lazy {
+        AppDatabase.getDatabase(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar))
+
+        todoRv.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = this@MainActivity.adaptor
+        }
+
+        db.todoDao().getTask().observe(this, {
+            if(!it.isNullOrEmpty()) {
+                list.clear()
+                list.addAll(it)
+                adaptor.notifyDataSetChanged()
+            }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
