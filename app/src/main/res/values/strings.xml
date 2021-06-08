@@ -10,4 +10,6 @@
     <string name="set_reminder_date_and_time">Set reminder date and time</string>
     <string name="set_date">Set Date</string>
     <string name="set_time">Set Time</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
 </resources>
