@@ -19,4 +19,7 @@ interface TodoDao {
 
     @Query("DELETE from TodoModel WHERE id=:uid")
     fun deleteTask(uid: Long)
+
+    @Query("SELECT * FROM TodoModel WHERE isFinished == 1")
+    fun getFinishedTask(): LiveData<List<TodoModel>>
 }
