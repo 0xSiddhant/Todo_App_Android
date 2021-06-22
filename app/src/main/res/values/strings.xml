@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TodoApp</string>
+    <string name="app_name">Todo</string>
     <string name="history">History</string>
     <string name="search">Search</string>
     <string name="save_task">Save Task</string>
